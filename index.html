@@ -366,7 +366,7 @@ window.IOB_PHASE = (function(){
   <div class="wrap">
     <div class="eyebrow">オーガニック専門家コースを<br>受講してくださったみなさんへ</div>
     <h1>学んだことを、<br>試験で終わらせない1年。</h1>
-    <div class="lead">毎日1通、手紙が届きます。<br>OSで学んだことを、忘れず、止めず、<br>自分の言葉で使えるようになるまで。<br>10月19日（月）から、みなさん一斉に始まります。</div>
+    <div class="lead">毎日1通、手紙が届きます。<br>オーガニック専門家コースで学んだことを、忘れず、止めず、<br>自分の言葉で使えるようになるまで。<br>10月19日（月）から、みなさん一斉に始まります。</div>
     <img class="logo" src="iob-logo-orange.png" alt="Institut für Organic Business" width="170">
   </div>
   <div class="hero-cap">2026年 独ビオホテル・タナホフツアーにて受講生と</div>
@@ -479,6 +479,10 @@ window.IOB_PHASE = (function(){
             <div class="eur">€280<span class="per">／年（12ヶ月）</span></div>
             <div class="monthly">月あたり約€23・3回払いOK</div>
             <div class="monthly-note">※年額を12で割った目安です</div>
+          </div>
+          <div class="resid-price" style="margin-top:12px;font-size:14px;line-height:1.9;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;">
+            <div><b>日本在住</b>：€280（消費税10%込み）</div>
+            <div><b>欧州在住</b>：€302.91（付加価値税19%込み）／3回払い €101×3</div>
           </div>
           <div class="start">2026年10月19日（月）配信開始 〜 2027年9月</div>
         </div>
@@ -643,6 +647,15 @@ window.IOB_PHASE = (function(){
         <div style="background:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;">Daily Letters 2026-27（€280／年）</div>
       </div>
       <div class="field">
+        <label>お住まい<span class="req">必須</span></label>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="residence" value="日本在住" required checked>日本</label>
+          <label class="radio-opt"><input type="radio" name="residence" value="欧州在住">欧州（EU）</label>
+        </div>
+        <p id="euWait" style="display:none;margin-top:10px;font-size:14px;font-weight:700;color:var(--point);">お申し込みはもう少しお待ちください。<br><span style="font-weight:400;color:var(--ink);">10月12日（月）欧州時間の午後より開始します。<br>ご連絡は school@iob.bio まで。</span></p>
+        <!-- 欧州在住の決済リンクが届いたら（月曜10/12予定）、この表示を外して送信できるようにする。GAS（本番）の欧州分岐を確認してから貼り替える -->
+      </div>
+      <div class="field">
         <label>ご希望の決済方法<span class="req">必須</span></label>
         <div class="radio-row">
           <label class="radio-opt"><input type="radio" name="payment" value="銀行振込（日本）" required>銀行振込<br>（日本）</label>
@@ -771,8 +784,20 @@ window.IOB_PHASE = (function(){
 
   const form = document.getElementById('applyForm');
   const btn = document.getElementById('submitBtn');
+  // ── 欧州在住：決済リンクの準備ができるまで送信させない（日本価格のリンクが自動返信される事故を防ぐ）──
+  var EU_OPEN = false; // 欧州在住の決済リンクが届いて自動返信を入れ替えたら true にする
+  function syncResidence(){
+    var r = (form.querySelector('input[name=residence]:checked') || {}).value;
+    var wait = (r === "欧州在住") && !EU_OPEN;
+    document.getElementById('euWait').style.display = wait ? "block" : "none";
+    btn.disabled = wait;
+  }
+  form.querySelectorAll('input[name=residence]').forEach(function(x){ x.addEventListener('change', syncResidence); });
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    var _r = (form.querySelector('input[name=residence]:checked') || {}).value;
+    if(_r === "欧州在住" && !EU_OPEN){ syncResidence(); return; }
     if(!document.getElementById('agree').checked){ return; }
     btn.disabled = true;
     btn.textContent = "送信中…";
@@ -781,6 +806,7 @@ window.IOB_PHASE = (function(){
       name: form.name.value,
       email: form.email.value,
       type: "DL単体",
+      residence: (form.querySelector('input[name=residence]:checked') || {}).value || "日本在住",
       plan: "Daily Letters（€280）",
       payment: (form.querySelector('input[name=payment]:checked') || {}).value || "",
       installment: (form.querySelector('input[name=installment]:checked') || {}).value || "",
