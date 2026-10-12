@@ -785,7 +785,7 @@ window.IOB_PHASE = (function(){
   const form = document.getElementById('applyForm');
   const btn = document.getElementById('submitBtn');
   // ── 欧州在住：決済リンクの準備ができるまで送信させない（日本価格のリンクが自動返信される事故を防ぐ）──
-  var EU_OPEN = false; // 欧州在住の決済リンクが届いて自動返信を入れ替えたら true にする
+  var EU_OPEN = true; // 欧州在住の決済リンク4本を本番GAS v30 に反映済み（2026-10-12）
   function syncResidence(){
     var r = (form.querySelector('input[name=residence]:checked') || {}).value;
     var wait = (r === "欧州在住") && !EU_OPEN;
